@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-button type="primary" style="margin:20px;" @click="addDialogVisible= true">新增</el-button>
+    <el-button type="primary" style="margin:20px;" @click="addDialogVisible = true">新增</el-button>
     <el-table :data="tableData" style="width: 100%" highlight-current-row>
       <el-table-column fixed="left" type="index" width="80" />
       <el-table-column prop="id" label="id" width="80" />
-      <el-table-column prop="name" label="家具名字" width="150" />
-      <el-table-column prop="factory" label="家具厂" width="150" />
+      <el-table-column prop="name" label="家具" width="150" />
+      <el-table-column prop="factory" label="厂商" width="150" />
       <el-table-column prop="price" label="价格" width="150" />
       <el-table-column prop="sale" label="销量" width="150" />
       <el-table-column prop="residue" label="库存" />
@@ -17,23 +17,23 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog v-model="addDialogVisible" title="添加" width="650px" center>
-      <goodsView>
+    <el-dialog v-model="addDialogVisible" title="添加" width="650px" center destroy-on-close="true" @close="handleClose">
+      <goodsView :loading = "loading">
         <template #ok="form">
           <el-button type="primary" @click="onSubmit(form)">添加</el-button>
         </template>
         <template #cancel>
-          <el-button @click="addDialogVisible = false">取消</el-button>
+          <el-button @click="handleClose">取消</el-button>
         </template>
       </goodsView>
     </el-dialog>
-    <el-dialog v-model="editDialogVisible" title="添加" width="650px" center>
-      <goodsView>
+    <el-dialog v-model="editDialogVisible" title="添加" width="650px" center destroy-on-close="true" @close="handleClose">
+      <goodsView :loading = "loading">
         <template #ok="form">
           <el-button type="primary" @click="onEdit(form)">提交</el-button>
         </template>
         <template #cancel>
-          <el-button @click="editDialogVisible = false">取消</el-button>
+          <el-button @click="handleClose">取消</el-button>
         </template>
       </goodsView>
     </el-dialog>
@@ -45,15 +45,19 @@ import "element-plus/theme-chalk/el-message-box.css";// messageBox的样式
 // @ is an alias to /src
 import { ElMessage, ElMessageBox } from 'element-plus'
 import goodsView from "@/views/goodsView.vue"
-import { h,ref } from 'vue'
+import { h, ref } from 'vue'
+
+
+
 export default {
   name: 'tableView',
   components: {
-    goodsView
+    goodsView,
   },
   setup() {
     const addDialogVisible = ref(false)
     const editDialogVisible = ref(false)
+    const loading = ref(false)
     const tableData = [
       {
         id: 1,
@@ -113,15 +117,25 @@ export default {
     //提交数据
     const onSubmit = (row) => {
       console.log(row);
+      loading.value = true;
       addDialogVisible.value = false;
     }
     //操作栏编辑事件
     const handleEdit = (row) => {
       console.log(row);
+      
       editDialogVisible.value = true;
     }
     const onEdit = (row) => {
       console.log(row);
+      loading.value = true;
+      editDialogVisible.value = false;
+    }
+
+    //关闭事件
+    const handleClose = () => {
+      loading.value = false;
+      addDialogVisible.value = false;
       editDialogVisible.value = false;
     }
     return {
@@ -131,9 +145,13 @@ export default {
       addDialogVisible,
       editDialogVisible,
       handleEdit,
-      onEdit
+      onEdit,
+      loading,
+      handleClose
     }
   }
 }
 </script>
-<style scoped></style>
+<style scoped>
+
+</style>

@@ -1,12 +1,13 @@
 <template>
   <div>
-    <el-container>
+    <!-- <el-container>
       <el-header>顶部菜单栏</el-header>
       <el-container>
         <el-aside width="200px">菜单栏</el-aside>
         <el-main> <router-view /></el-main>
       </el-container>
-    </el-container>
+    </el-container> -->
+    <router-view />
   </div>
 </template>
 <script>
@@ -18,7 +19,5 @@ export default {
 }
 </script>
 <style lang="less">
-body {
-  padding: 20px;
-}
+
 </style>

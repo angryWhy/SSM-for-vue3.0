@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-form :model="form" label-width="120px">
+        <el-form :model="form" label-width="120px" v-loading="loading2">
             <el-form-item label="家具名字">
                 <el-input v-model="form.name" />
             </el-form-item>
@@ -27,18 +27,25 @@
 <script>
 import "element-plus/theme-chalk/el-message-box.css";
 
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 export default {
     name: 'goodsView',
+    props: ["loading"],
     components: {
 
     },
-    setup() {
+    setup(props) {
+        const loading2 = ref(props.loading)
         const form = ref({
             name: "1"
         })
+        watchEffect(() => {
+            loading2.value = props.loading;
+            console.log(props.loading);
+        })
         return {
-            form
+            form,
+            loading2
         }
     }
 }
