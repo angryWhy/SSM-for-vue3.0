@@ -26,8 +26,8 @@
         </template>
       </goodsView>
     </el-dialog>
-    <el-dialog v-model="editDialogVisible" title="添加" width="650px" center destroy-on-close="true" @close="handleClose">
-      <goodsView :loading="loading">
+    <el-dialog v-model="editDialogVisible" title="编辑" width="650px" center destroy-on-close="true" @close="handleClose">
+      <goodsView :loading="loading" :currentRow="currentRow">
         <template #ok="form">
           <el-button type="primary" @click="onEdit(form)">提交</el-button>
         </template>
@@ -45,7 +45,7 @@ import "element-plus/theme-chalk/el-message-box.css";// messageBox的样式
 import { ElMessage, ElMessageBox } from 'element-plus'
 import goodsView from "@/views/goodsView.vue"
 import { h, onMounted, ref } from 'vue'
-import { searchFurn, searchFurn2, addFurn } from "@/services/furnRequest.js"
+import { addFurn, searchAll, updateFurn, deletedFurn } from "@/services/furnRequest.js"
 
 
 export default {
@@ -54,31 +54,14 @@ export default {
     goodsView,
   },
   setup() {
-    const addDialogVisible = ref(false)
-    const editDialogVisible = ref(false)
-    const loading = ref(false)
-    const tableData = [
-      {
-        id: 1,
-        name: "桌子",
-        factory: "顺华家具",
-        price: "900.5",
-        sale: "10",
-        residue: 10
-      },
-      {
-        id: 2,
-        name: "凳子",
-        factory: "胜利家具",
-        price: "2000.99",
-        sale: "5",
-        residue: 2
-      }
-    ]
+    const addDialogVisible = ref(false);
+    const editDialogVisible = ref(false);
+    const loading = ref(false);
+    const tableData = ref([]);
+    const currentRow = ref();
 
     //删除数据
     const handleDelete = (row) => {
-      console.log(row);
       ElMessageBox({
         title: '提示框',
         message: h('p', null, [
@@ -93,12 +76,21 @@ export default {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '删除中...'
-            setTimeout(() => {
-              done()
-              setTimeout(() => {
+            deletedFurn(row.id).then(res => {
+              if (res.code == 200) {
+                ElMessage({
+                  message: '删除成功',
+                  type: 'success',
+                })
                 instance.confirmButtonLoading = false
-              }, 300)
-            }, 1000)
+                done()
+                loadData()
+              } else {
+                instance.confirmButtonLoading = false
+                done()
+                ElMessage.error('删除失败')
+              }
+            })
           } else if (action === 'cancel') {
             done()
           } else {
@@ -106,40 +98,60 @@ export default {
           }
         },
       }).then(() => {
-        ElMessage({
-          type: 'success',
-          message: `删除成功`,
-        })
+       
       })
     }
 
     //提交数据
     const onSubmit = (data) => {
-      loading.value = true;
-      addFurn(data.form).then(res => {
-        console.log(res);
-        if (res.code == 200) {
-          ElMessage({
-            message: '添加成功',
-            type: 'success',
+      let formRef = data.formRef;
+      formRef.validate((valid) => {
+        if (valid) {
+          addFurn(data.form).then(res => {
+            loading.value = true;
+            if (res.code == 200) {
+              ElMessage({
+                message: '添加成功',
+                type: 'success',
+              })
+              loading.value = false;
+              addDialogVisible.value = false;
+              loadData()
+            } else {
+              ElMessage.error('添加失败')
+            }
           })
-        }else{
-          ElMessage.error('添加失败')
         }
       })
-
-      addDialogVisible.value = false;
     }
+
     //操作栏编辑事件
     const handleEdit = (row) => {
-      console.log(row);
-
+      currentRow.value = row;
       editDialogVisible.value = true;
     }
-    const onEdit = (row) => {
-      console.log(row);
-      loading.value = true;
-      editDialogVisible.value = false;
+
+    //编辑提交事件
+    const onEdit = (data) => {
+      let formRef = data.formRef;
+      formRef.validate((valid) => {
+        if (valid) {
+          updateFurn(data.form).then(res => {
+            loading.value = true;
+            if (res.code == 200) {
+              ElMessage({
+                message: '编辑成功',
+                type: 'success',
+              })
+              loading.value = false;
+              editDialogVisible.value = false;
+              loadData()
+            } else {
+              ElMessage.error('编辑失败')
+            }
+          })
+        }
+      })
     }
 
     //关闭事件
@@ -149,14 +161,18 @@ export default {
       editDialogVisible.value = false;
     }
 
+    //表格加载事件
+    const loadData = () => {
+      searchAll().then(res => {
+        if (res.code == 200) {
+          tableData.value = res.extend.result;
+        }
+      })
+    }
+
     //获取信息列表
     onMounted(() => {
-      searchFurn().then(res => {
-        console.log(res);
-      })
-      searchFurn2().then(res => {
-        console.log(res);
-      })
+      loadData()
     })
     return {
       tableData,
@@ -167,7 +183,8 @@ export default {
       handleEdit,
       onEdit,
       loading,
-      handleClose
+      handleClose,
+      currentRow
     }
   }
 }
