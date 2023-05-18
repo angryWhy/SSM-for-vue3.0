@@ -1,6 +1,6 @@
 <template>
     <div class="login-form ">
-        <div class="rainbow">1111111111111</div>
+        <div class="rainbow"></div>
         <flush-button/>
     </div>
 </template>

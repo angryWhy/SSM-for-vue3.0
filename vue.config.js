@@ -6,7 +6,16 @@ module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
     port: 8003, // 启动端口号
-    open: true  // 
+    open: true, // 
+    proxy: {
+      '^/api': {
+        target: 'http://localhost:8080/',
+        pathRewrite: {
+          '^/api': ''
+        },
+        changeOrigin: true
+      }
+    }
   },
   configureWebpack: {
     plugins: [

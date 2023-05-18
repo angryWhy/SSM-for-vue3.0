@@ -1,20 +1,21 @@
 <template>
     <div>
+
         <el-form :model="form" label-width="120px" v-loading="loading2">
             <el-form-item label="家具名字">
                 <el-input v-model="form.name" />
             </el-form-item>
             <el-form-item label="家具厂">
-                <el-input v-model="form.name" />
+                <el-input v-model="form.marker" />
             </el-form-item>
             <el-form-item label="价格">
-                <el-input v-model="form.name" />
+                <el-input v-model="form.price" />
             </el-form-item>
             <el-form-item label="销量">
-                <el-input v-model="form.name" />
+                <el-input v-model="form.sales" />
             </el-form-item>
             <el-form-item label="库存">
-                <el-input v-model="form.name" />
+                <el-input v-model="form.stock" />
             </el-form-item>
             <el-form-item>
                 <slot name="ok" :form="form"></slot>
@@ -23,7 +24,6 @@
         </el-form>
     </div>
 </template>
-  
 <script>
 import "element-plus/theme-chalk/el-message-box.css";
 
@@ -37,11 +37,15 @@ export default {
     setup(props) {
         const loading2 = ref(props.loading)
         const form = ref({
-            name: "1"
+            name:"",
+            marker:"",
+            price:"",
+            sales:"",
+            stock:"",
+            img_path:"assets/imgages/2.jgp"
         })
         watchEffect(() => {
             loading2.value = props.loading;
-            console.log(props.loading);
         })
         return {
             form,

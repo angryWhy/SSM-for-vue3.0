@@ -5,10 +5,10 @@
       <el-table-column fixed="left" type="index" width="80" />
       <el-table-column prop="id" label="id" width="80" />
       <el-table-column prop="name" label="家具" width="150" />
-      <el-table-column prop="factory" label="厂商" width="150" />
+      <el-table-column prop="marker" label="厂商" width="150" />
       <el-table-column prop="price" label="价格" width="150" />
-      <el-table-column prop="sale" label="销量" width="150" />
-      <el-table-column prop="residue" label="库存" />
+      <el-table-column prop="sales" label="销量" width="150" />
+      <el-table-column prop="stock" label="库存" />
       <el-table-column fixed="right" label="操作栏" width="200">
         <template #default="scope">
           <el-button type="primary" size="small" @click="handleEdit(scope.row)">编辑</el-button>
@@ -16,9 +16,8 @@
         </template>
       </el-table-column>
     </el-table>
-
     <el-dialog v-model="addDialogVisible" title="添加" width="650px" center destroy-on-close="true" @close="handleClose">
-      <goodsView :loading = "loading">
+      <goodsView :loading="loading">
         <template #ok="form">
           <el-button type="primary" @click="onSubmit(form)">添加</el-button>
         </template>
@@ -28,7 +27,7 @@
       </goodsView>
     </el-dialog>
     <el-dialog v-model="editDialogVisible" title="添加" width="650px" center destroy-on-close="true" @close="handleClose">
-      <goodsView :loading = "loading">
+      <goodsView :loading="loading">
         <template #ok="form">
           <el-button type="primary" @click="onEdit(form)">提交</el-button>
         </template>
@@ -45,8 +44,8 @@ import "element-plus/theme-chalk/el-message-box.css";// messageBox的样式
 // @ is an alias to /src
 import { ElMessage, ElMessageBox } from 'element-plus'
 import goodsView from "@/views/goodsView.vue"
-import { h, ref } from 'vue'
-
+import { h, onMounted, ref } from 'vue'
+import { searchFurn, searchFurn2, addFurn } from "@/services/furnRequest.js"
 
 
 export default {
@@ -115,15 +114,26 @@ export default {
     }
 
     //提交数据
-    const onSubmit = (row) => {
-      console.log(row);
+    const onSubmit = (data) => {
       loading.value = true;
+      addFurn(data.form).then(res => {
+        console.log(res);
+        if (res.code == 200) {
+          ElMessage({
+            message: '添加成功',
+            type: 'success',
+          })
+        }else{
+          ElMessage.error('添加失败')
+        }
+      })
+
       addDialogVisible.value = false;
     }
     //操作栏编辑事件
     const handleEdit = (row) => {
       console.log(row);
-      
+
       editDialogVisible.value = true;
     }
     const onEdit = (row) => {
@@ -138,6 +148,16 @@ export default {
       addDialogVisible.value = false;
       editDialogVisible.value = false;
     }
+
+    //获取信息列表
+    onMounted(() => {
+      searchFurn().then(res => {
+        console.log(res);
+      })
+      searchFurn2().then(res => {
+        console.log(res);
+      })
+    })
     return {
       tableData,
       handleDelete,
@@ -152,6 +172,4 @@ export default {
   }
 }
 </script>
-<style scoped>
-
-</style>
+<style scoped></style>
