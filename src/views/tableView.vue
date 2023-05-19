@@ -1,6 +1,23 @@
 <template>
   <div>
     <el-button type="primary" style="margin:20px;" @click="addDialogVisible = true">新增</el-button>
+    <div>
+      <div style="display:flex;align-items:center;justify-content: space-between;">
+        <div style="display:flex;align-items:center;">
+          <div>
+            商品名字：
+          </div>
+          <div>
+            <el-input v-model="name" placeholder="输入家具名字" />
+          </div>
+        </div>
+        <div>
+          <el-button @click="loadData()" type="primary" style="margin-right:4vw;">查询</el-button>
+        </div>
+      </div>
+
+    </div>
+
     <el-table :data="tableData" style="width: 100%" highlight-current-row>
       <el-table-column fixed="left" type="index" width="80" />
       <el-table-column prop="id" label="id" width="80" />
@@ -16,6 +33,10 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination v-model:currentPage="pagination.pageIndex" background v-model:page-size="pagination.pageSize"
+      :page-sizes="[10, 20, 50, 100, 500, 1000]" layout="total, sizes, prev, pager, next, jumper"
+      :total="pagination.totalcount" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
+
     <el-dialog v-model="addDialogVisible" title="添加" width="650px" center destroy-on-close="true" @close="handleClose">
       <goodsView :loading="loading">
         <template #ok="form">
@@ -45,7 +66,7 @@ import "element-plus/theme-chalk/el-message-box.css";// messageBox的样式
 import { ElMessage, ElMessageBox } from 'element-plus'
 import goodsView from "@/views/goodsView.vue"
 import { h, onMounted, ref } from 'vue'
-import { addFurn, searchAll, updateFurn, deletedFurn } from "@/services/furnRequest.js"
+import { addFurn, updateFurn, deletedFurn, searchByPageCondition } from "@/services/furnRequest.js"
 
 
 export default {
@@ -59,7 +80,21 @@ export default {
     const loading = ref(false);
     const tableData = ref([]);
     const currentRow = ref();
-
+    const name = ref("")
+    let pagination = ref({
+      pageIndex: 1,
+      pageSize: 20,
+      totalcount: 0,
+    });
+    //分页操作
+    const handleSizeChange = (index) => {
+      pagination.value.pageSize = index;
+      loadData();
+    };
+    const handleCurrentChange = (index) => {
+      pagination.value.pageIndex = index;
+      loadData();
+    };
     //删除数据
     const handleDelete = (row) => {
       ElMessageBox({
@@ -98,7 +133,7 @@ export default {
           }
         },
       }).then(() => {
-       
+
       })
     }
 
@@ -163,10 +198,15 @@ export default {
 
     //表格加载事件
     const loadData = () => {
-      searchAll().then(res => {
-        if (res.code == 200) {
-          tableData.value = res.extend.result;
-        }
+      searchByPageCondition({
+        pageNum: pagination.value.pageIndex,
+        pageSize: pagination.value.pageSize,
+        condition: name.value
+      }).then(res => {
+        tableData.value = res.extend.list.list;
+        pagination.value.pageIndex = res.extend.list.pageNum;
+        pagination.value.pageSize = res.extend.list.pageSize;
+        pagination.value.totalcount = res.extend.list.total;
       })
     }
 
@@ -184,7 +224,12 @@ export default {
       onEdit,
       loading,
       handleClose,
-      currentRow
+      currentRow,
+      pagination,
+      handleSizeChange,
+      handleCurrentChange,
+      name,
+      loadData
     }
   }
 }

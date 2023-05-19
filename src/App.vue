@@ -14,7 +14,7 @@
 import "@/assets/normalize.css"
 export default {
   setup() {
-
+    
   },
 }
 </script>

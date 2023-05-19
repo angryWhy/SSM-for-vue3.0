@@ -33,3 +33,16 @@ export function deletedFurn(id){
         method:"POST"
     })
 }
+export function searchByPage(params){
+    return request({
+        url:"/ssm/furn-by-page",
+        params:params
+    })
+}
+
+export function searchByPageCondition(params){
+    return request({
+        url:"/ssm/furn-by-condition",
+        params:params
+    })
+}
