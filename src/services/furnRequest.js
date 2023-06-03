@@ -1,4 +1,23 @@
 import request from './request';
+//springboot接口
+export function furnSave(params){
+    return request({
+        url:"/save",
+        data:{
+            ...params   
+        },
+        method:"POST"
+    })
+}
+export function furnList(){
+    return request({
+        url:"/list",
+        method:"GET"
+    })
+}
+
+
+//SSM接口
 export function searchFurn(){
     return request({
         url:"/ssm/hi"

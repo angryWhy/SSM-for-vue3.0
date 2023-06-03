@@ -3,12 +3,17 @@ import { createRouter, createWebHistory } from 'vue-router'
 const routes = [
   {
     path: '/',
-    redirect: "/table",
+    redirect: "/SpringBoot-App",
   },
   {
-    path: '/table',
-    name: 'tableView',
+    path: '/SSM-App',
+    name: 'ssmApp',
     component: () => import(/* webpackChunkName: "about" */ '../views/tableView.vue')
+  },
+  {
+    path: '/SpringBoot-App',
+    name: 'bootApp',
+    component: () => import(/* webpackChunkName: "about" */ '../views/bootApp.vue')
   },
   {
     path: '/login',

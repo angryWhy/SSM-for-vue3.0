@@ -67,11 +67,11 @@ import "element-plus/theme-chalk/el-message-box.css";// messageBox的样式
 import { ElMessage, ElMessageBox } from 'element-plus'
 import goodsView from "@/views/goodsView.vue"
 import { h, onMounted, ref } from 'vue'
-import { addFurn, updateFurn, deletedFurn, searchByPageCondition } from "@/services/furnRequest.js"
+import { addFurn, updateFurn, deletedFurn,furnSave, furnList } from "@/services/furnRequest.js"
 
 
 export default {
-  name: 'ssmApp',
+  name: 'bootApp',
   components: {
     goodsView,
   },
@@ -199,15 +199,8 @@ export default {
 
     //表格加载事件
     const loadData = () => {
-      searchByPageCondition({
-        pageNum: pagination.value.pageIndex,
-        pageSize: pagination.value.pageSize,
-        condition: name.value
-      }).then(res => {
-        tableData.value = res.extend.list.list;
-        pagination.value.pageIndex = res.extend.list.pageNum;
-        pagination.value.pageSize = res.extend.list.pageSize;
-        pagination.value.totalcount = res.extend.list.total;
+      furnList().then(res=>{
+        tableData.value = res.data
       })
     }
 
