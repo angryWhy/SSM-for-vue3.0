@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1>SSM-APP</h1>
+
     <el-button type="primary" style="margin:20px;" @click="addDialogVisible = true">新增</el-button>
     <div>
       <div style="display:flex;align-items:center;justify-content: space-between;">
@@ -37,7 +37,6 @@
     <el-pagination v-model:currentPage="pagination.pageIndex" background v-model:page-size="pagination.pageSize"
       :page-sizes="[10, 20, 50, 100, 500, 1000]" layout="total, sizes, prev, pager, next, jumper"
       :total="pagination.totalcount" @size-change="handleSizeChange" @current-change="handleCurrentChange" />
-      <h1>springboot-APP</h1>
     <el-dialog v-model="addDialogVisible" title="添加" width="650px" center destroy-on-close="true" @close="handleClose">
       <goodsView :loading="loading">
         <template #ok="form">
@@ -67,7 +66,7 @@ import "element-plus/theme-chalk/el-message-box.css";// messageBox的样式
 import { ElMessage, ElMessageBox } from 'element-plus'
 import goodsView from "@/views/goodsView.vue"
 import { h, onMounted, ref } from 'vue'
-import { addFurn, updateFurn, deletedFurn,furnSave, furnList } from "@/services/furnRequest.js"
+import {  updatefurn, delFurn,furnSave, listByPage } from "@/services/furnRequest.js"
 
 
 export default {
@@ -112,7 +111,7 @@ export default {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '删除中...'
-            deletedFurn(row.id).then(res => {
+            delFurn(row.id).then(res => {
               if (res.code == 200) {
                 ElMessage({
                   message: '删除成功',
@@ -143,7 +142,7 @@ export default {
       let formRef = data.formRef;
       formRef.validate((valid) => {
         if (valid) {
-          addFurn(data.form).then(res => {
+          furnSave(data.form).then(res => {
             loading.value = true;
             if (res.code == 200) {
               ElMessage({
@@ -172,7 +171,7 @@ export default {
       let formRef = data.formRef;
       formRef.validate((valid) => {
         if (valid) {
-          updateFurn(data.form).then(res => {
+          updatefurn(data.form).then(res => {
             loading.value = true;
             if (res.code == 200) {
               ElMessage({
@@ -199,8 +198,13 @@ export default {
 
     //表格加载事件
     const loadData = () => {
-      furnList().then(res=>{
-        tableData.value = res.data
+      listByPage({
+        pageNum: pagination.value.pageIndex,
+        pageSize: pagination.value.pageSize,
+        search: name.value
+      }).then(res=>{
+        tableData.value = res.data.records;
+        pagination.value.totalcount = res.data.total
       })
     }
 

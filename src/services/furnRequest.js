@@ -16,6 +16,29 @@ export function furnList(){
     })
 }
 
+export function updatefurn(params){
+    return request({
+        url:"/update",
+        data:{
+            ...params   
+        },
+       method:"PUT"
+    })
+}
+export function delFurn(id){
+    return request({
+        url:`/deleted/${id}`,
+        method:"DELETE"
+    })
+}
+//带分页，带条件
+export function listByPage(params){
+    return request({
+        url:"/listByCondition",
+        params:params
+    })
+}
+
 
 //SSM接口
 export function searchFurn(){
